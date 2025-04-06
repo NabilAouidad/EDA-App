@@ -2,13 +2,13 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-def plotPairPlots(df, color):
-    num_cols = df.select_dtypes(include = ["number"]).columns.tolist()
+def plotPairPlots(df, num_cols, color):
+    #num_cols = df.select_dtypes(include = ["number"]).columns.tolist()
     df[None] = None
     fig = go.Figure(data = px.scatter_matrix(df[num_cols],
                                              color = df[color],
-                                         dimensions = num_cols,
-                                           width = 1000, height = 1000)
+                                             dimensions = num_cols,
+                                             width = 1000, height = 1000)
     )
     return fig
 

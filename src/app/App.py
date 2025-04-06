@@ -3,9 +3,13 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from plotting.distributions import plotHistograms, plotBoxes, plotBars
-from plotting.correlations import plotPairPlots, plotHeatMap
+from distributions import plotHistograms, plotBoxes, plotBars
+from correlations import plotPairPlots, plotHeatMap
 from scipy.stats import zscore
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 st.set_page_config(layout = "wide", page_title = "Data Cleaning Toolkit")
 
 style = """
@@ -110,7 +114,8 @@ if uploaded_file:
             showDataInfo(df)
 
         case "Data Quality":
-            dataQualityBox = st.selectbox(label = " ", options = ["Duplicates", "Missing Data", "Outliers"], 
+            dataQualityBox = st.selectbox(label = "Select the data quality issue you want to check for", 
+                                          options = ["Duplicates", "Missing Data", "Outliers"], 
                                           index = None)
             
             match dataQualityBox:
@@ -122,7 +127,8 @@ if uploaded_file:
                 case "Outliers":
                     st.plotly_chart(plotHistograms(df))
                     st.plotly_chart(plotBoxes(df))
-                    outliersBox = st.selectbox(label = " ", options = ["Z Score", "Interquantile Range"], 
+                    outliersBox = st.selectbox(label = "Choose the method you want to use int order to retrieve the list of the outliers", 
+                                               options = ["Z Score", "Interquantile Range"], 
                                                index = None)
                     match outliersBox:
                         case "Z Score":
@@ -135,21 +141,32 @@ if uploaded_file:
             st.plotly_chart(plotBars(df))
 
         case "Correlations":
-            color = st.selectbox(label = " ", options = extractObjCols(df), index = None)
-            st.plotly_chart(plotPairPlots(df, color))
-            st.plotly_chart(plotHeatMap(df))
+            col1, col2 = st.columns(2)
+            num_cols = col1.multiselect(label = "Select the numerical features to plot the correlations map",
+                                        options = extractNumCols(df))
+            color = col2.selectbox(label = "Color", options = extractObjCols(df), index = None)
+            
+            st.plotly_chart(plotPairPlots(df, num_cols, color))
+            st.plotly_chart(plotHeatMap(df[num_cols]))
 
         case "Group By":
             col1, col2, col3 = st.columns(3)
 
-            num_cols = col1.multiselect(label = " ", options = extractNumCols(df))
-            obj_col = col2.selectbox(label = " ", options = extractObjCols(df), index = None)
+            num_cols = col1.multiselect(label = "Feature selection", options = extractNumCols(df))
+            obj_col = col3.selectbox(label = "Group by", options = extractObjCols(df), index = None)
+            stat = col2.selectbox(label = "Statistic", options = ["Mean", "Median", "Sum"])
 
             if None in [num_cols, obj_col]:
                 pass
 
             else:
-                df_grouped = df.groupby(obj_col)[num_cols].mean().reset_index()
+                match stat:
+                    case "Mean":   
+                        df_grouped = df.groupby(obj_col)[num_cols].mean().reset_index()
+                    case "Median":
+                        df_grouped = df.groupby(obj_col)[num_cols].median().reset_index()
+                    case "Sum":
+                        df_grouped = df.groupby(obj_col)[num_cols].sum().reset_index()
                 traces = []
                 for col in num_cols:
                     trace = go.Bar(x = df_grouped[obj_col], y = df_grouped[col], name = col)
