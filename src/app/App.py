@@ -65,7 +65,7 @@ def showDataInfo(df):
     st.dataframe(df.describe(include = "all"))
 
     st.markdown("### Data Sample")
-    st.dataframe(df.sample(200))
+    st.dataframe(df.sample(len(df)//10))
 
 def plotMissingData(df):
     missingData = df.isnull().sum()
@@ -137,8 +137,11 @@ if uploaded_file:
                             st.dataframe(extractOutliersIQR(df))
         
         case "Data Distributions":
-            st.plotly_chart(plotHistograms(df))
-            st.plotly_chart(plotBars(df))
+            try:
+                st.plotly_chart(plotHistograms(df))
+                st.plotly_chart(plotBars(df))
+            except (IndexError, ZeroDivisionError) as e:
+                st.empty()
 
         case "Correlations":
             col1, col2 = st.columns(2)
