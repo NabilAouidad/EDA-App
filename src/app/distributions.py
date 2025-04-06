@@ -34,7 +34,7 @@ def plotBars(df):
     fig = make_subplots(rows = n_rows, cols = n_cols,
                         column_widths = [1000 for i in range(n_cols)], 
                         row_heights = [1000 for i in range(n_rows)],
-                        horizontal_spacing = 0.13, vertical_spacing = 0.17)
+                        horizontal_spacing = 1/(num_frames-1), vertical_spacing = 0.17)
     fig.update_layout({"height":900, "width":900})
 
     for i in range(1, n_rows+1):
@@ -66,7 +66,7 @@ def plotHistograms(df):
     fig = make_subplots(rows = n_rows, cols = n_cols,
                         column_widths = [1000 for i in range(n_cols)], 
                         row_heights = [1000 for i in range(n_rows)],
-                        horizontal_spacing = 0.13, vertical_spacing = 0.17)
+                        horizontal_spacing = 1/(num_frames-1), vertical_spacing = 0.17)
     fig.update_layout({"height":900, "width":900})
     
     for i in range(1, n_rows+1):
