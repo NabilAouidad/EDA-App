@@ -26,6 +26,9 @@ def plotBars(df):
     if isPrime(num_frames):
         num_frames = num_frames+1
 
+    if num_frames == 1:
+        num_frames += 1
+
     color_pallette = qualitative.Dark24
     num_colors = len(color_pallette)
 
