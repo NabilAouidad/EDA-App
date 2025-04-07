@@ -125,14 +125,20 @@ if uploaded_file:
                     st.dataframe(pd.DataFrame(df.isnull().sum(), columns = ["Count"]))
                     st.plotly_chart(plotMissingData(df))
                 case "Outliers":
-                    st.plotly_chart(plotHistograms(df))
-                    st.plotly_chart(plotBoxes(df))
+                    try:
+                        st.plotly_chart(plotHistograms(df))
+                        st.plotly_chart(plotBoxes(df))
+                    except (IndexError, ZeroDivisionError):
+                        st.empty()
                     outliersBox = st.selectbox(label = "Choose the method you want to use int order to retrieve the list of the outliers", 
                                                options = ["Z Score", "Interquantile Range"], 
                                                index = None)
                     match outliersBox:
                         case "Z Score":
-                            st.dataframe(extractOutliersZScore(df))
+                            try:
+                                st.dataframe(extractOutliersZScore(df))
+                            except ValueError:
+                                st.empty()
                         case "Interquantile Range":
                             st.dataframe(extractOutliersIQR(df))
         
